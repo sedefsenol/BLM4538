@@ -1,29 +1,52 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { ImageBackground } from "react-native";
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
+import axios from "axios";
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = () => {
-    navigation.replace("MainTabs");
+  const handleLogin = async () => {
+    setErrorMessage("");
+
+    try {
+      await axios.post(
+        "http://10.0.2.2:5000/api/auth/login",
+        {
+          fullName: fullName.trim(),
+          password: password.trim(),
+        }
+      );
+
+      navigation.replace("MainTabs");
+    } catch (error) {
+      console.log("LOGIN ERROR:", error.response?.data || error.message);
+
+      setErrorMessage("Kullanıcı adı veya şifre hatalı");
+    }
   };
 
   return (
     <ImageBackground
-  source={require("../assets/images/login-bg.jpeg")}
-  style={styles.container}
-  resizeMode="cover"
->
+      source={require("../assets/images/login-bg.jpeg")}
+      style={styles.container}
+      resizeMode="cover"
+    >
       <Text style={styles.title}>MekanHub</Text>
       <Text style={styles.subtitle}>Giriş Yap</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="E-posta"
-        value={email}
-        onChangeText={setEmail}
+        placeholder="Ad Soyad"
+        value={fullName}
+        onChangeText={setFullName}
         placeholderTextColor="#777"
       />
 
@@ -39,6 +62,10 @@ export default function LoginScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Giriş Yap</Text>
       </TouchableOpacity>
+
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
         <Text style={styles.linkText}>Kayıt Ol</Text>
@@ -85,12 +112,19 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 18,
+    marginBottom: 8,
   },
   buttonText: {
     color: "#222",
     fontSize: 17,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 12,
+    fontWeight: "500",
   },
   linkText: {
     textAlign: "center",

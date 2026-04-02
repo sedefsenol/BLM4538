@@ -1,22 +1,42 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { ImageBackground } from "react-native";
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  Alert,
+} from "react-native";
+import axios from "axios";
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
-    navigation.replace("MainTabs");
-  };
+  const handleRegister = async () => {
+  try {
+    await axios.post(
+      "http://10.0.2.2:5000/api/auth/register",
+      {
+        fullName: name.trim(),
+        email: email.trim().toLowerCase(),
+        password: password.trim(),
+      }
+    );
+
+    navigation.navigate("Login");
+  } catch (error) {
+    console.log("REGISTER ERROR:", error.response?.data || error.message);
+  }
+};
 
   return (
     <ImageBackground
-  source={require("../assets/images/login-bg.jpeg")}
-  style={styles.container}
-  resizeMode="cover"
->
+      source={require("../assets/images/login-bg.jpeg")}
+      style={styles.container}
+      resizeMode="cover"
+    >
       <Text style={styles.title}>MekanHub</Text>
       <Text style={styles.subtitle}>Kayıt Ol</Text>
 
@@ -34,6 +54,8 @@ export default function RegisterScreen({ navigation }) {
         value={email}
         onChangeText={setEmail}
         placeholderTextColor="#777"
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
 
       <TextInput
