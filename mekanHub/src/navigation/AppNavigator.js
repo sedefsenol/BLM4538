@@ -149,18 +149,11 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const isLoggedIn = true;
-
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isLoggedIn ? (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-        </>
-      ) : (
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-      )}
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="MainTabs" component={MainTabs} />
     </Stack.Navigator>
   );
 }
