@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 const oneCikanMekanlar = [
   {
@@ -14,6 +15,8 @@ const oneCikanMekanlar = [
     desc: "Sessiz ve rahat bir ortam",
     location: "Kızılay",
     rating: "4.5",
+    latitude: 39.9208,
+    longitude: 32.8541,
   },
   {
     id: "2",
@@ -21,6 +24,8 @@ const oneCikanMekanlar = [
     desc: "Kalabalık ve canlı bir mekan",
     location: "Bahçelievler",
     rating: "4.2",
+    latitude: 39.925,
+    longitude: 32.82,
   },
   {
     id: "3",
@@ -28,6 +33,8 @@ const oneCikanMekanlar = [
     desc: "Ders çalışmak için uygun",
     location: "Tunalı",
     rating: "4.8",
+    latitude: 39.91,
+    longitude: 32.86,
   },
 ];
 
@@ -54,8 +61,32 @@ export default function HomeScreen({ navigation }) {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.pageTitle}>Ana Sayfa</Text>
 
+      
       <View style={styles.mapContainer}>
-        <Text style={styles.mapText}>Harita Alanı</Text>
+        <MapView
+          style={{ flex: 1 }}
+          initialRegion={{
+            latitude: 39.9208,
+            longitude: 32.8541,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          }}
+        >
+          {oneCikanMekanlar.map((mekan) => (
+            <Marker
+              key={mekan.id}
+              coordinate={{
+                latitude: mekan.latitude,
+                longitude: mekan.longitude,
+              }}
+              title={mekan.name}
+              description={mekan.desc}
+              onPress={() =>
+                navigation.navigate("MekanDetail", { mekan })
+              }
+            />
+          ))}
+        </MapView>
       </View>
 
       <Text style={styles.sectionTitle}>Öne Çıkan Mekanlar</Text>
@@ -104,16 +135,9 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     height: 220,
-    backgroundColor: "#d9e4d8",
     borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
+    overflow: "hidden",
     marginBottom: 22,
-  },
-  mapText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#4d5c4c",
   },
   sectionTitle: {
     fontSize: 20,
