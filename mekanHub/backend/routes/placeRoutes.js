@@ -4,5 +4,6 @@ const placeController = require("../controllers/placeController");
 
 router.get("/", placeController.getPlaces);
 router.post("/", placeController.addPlace);
+router.get("/:id", placeController.getPlaceById);
 
 module.exports = router;

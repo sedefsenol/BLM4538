@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import axios from "axios";
 
 export default function MekanDetailScreen({ route }) {
-  const { mekan } = route.params;
+  const [mekan, setMekan] = useState(null);
+
+
+  useEffect(() => {
+    const id = route.params.id;
+
+    axios
+      .get(`http://10.0.2.2:5000/api/places/${id}`)
+      .then((res) => setMekan(res.data))
+      .catch((err) => console.log("DETAIL ERROR:", err));
+  }, []);
+
+
+  if (!mekan) {
+    return (
+      <View style={styles.container}>
+        <Text>Yükleniyor...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -12,21 +32,39 @@ export default function MekanDetailScreen({ route }) {
 
       <View style={styles.contentBox}>
         <Text style={styles.title}>{mekan.name}</Text>
-        <Text style={styles.desc}>{mekan.desc || "Açıklama bulunmuyor."}</Text>
+
+      
+        <Text style={styles.desc}>
+          {mekan.description || "Açıklama bulunmuyor."}
+        </Text>
 
         <View style={styles.infoBox}>
           <Text style={styles.label}>Konum</Text>
-          <Text style={styles.value}>{mekan.location || "Belirtilmedi"}</Text>
+          <Text style={styles.value}>
+            {mekan.location || "Belirtilmedi"}
+          </Text>
         </View>
 
+      
         <View style={styles.infoBox}>
           <Text style={styles.label}>Puan</Text>
-          <Text style={styles.value}>{mekan.rating || "-"}</Text>
+          <Text style={styles.value}>
+            ⭐ {mekan.averageRating ?? 0}
+          </Text>
+        </View>
+
+      
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>Yorum Sayısı</Text>
+          <Text style={styles.value}>
+            {mekan.reviewCount ?? 0}
+          </Text>
         </View>
       </View>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

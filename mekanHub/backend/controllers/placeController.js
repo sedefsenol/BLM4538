@@ -38,7 +38,31 @@ async function addPlace(req, res) {
   }
 }
 
+async function getPlaceById(req, res) {
+  try {
+    const id = req.params.id;
+
+    const place = await placeService.getPlaceById(id);
+
+    if (!place) {
+      return res.status(404).json({
+        message: "Place not found",
+      });
+    }
+
+    const response = placeResponseDto(place);
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error",
+    });
+  }
+}
+
 module.exports = {
   getPlaces,
   addPlace,
+  getPlaceById,
 };

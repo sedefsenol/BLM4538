@@ -4,7 +4,8 @@ async function getAllPlaces() {
   await poolConnect;
 
   const result = await pool.request().query(`
-    SELECT Id, CreatedByUserId, Name, Location, Description, AverageRating, CreatedAt
+    SELECT 
+      Id, CreatedByUserId, Name, Location, Description, CreatedAt
     FROM Places
     ORDER BY Id DESC
   `);
@@ -30,7 +31,43 @@ async function createPlace(place) {
   return result.recordset[0];
 }
 
+async function getPlaceById(id) {
+  await poolConnect;
+
+  const placeResult = await pool.request()
+    .input("Id", sql.Int, id)
+    .query(`
+      SELECT 
+        Id, CreatedByUserId, Name, Location, Description, CreatedAt
+      FROM Places
+      WHERE Id = @Id
+    `);
+
+  const place = placeResult.recordset[0];
+
+  if (!place) return null;
+
+  const reviewResult = await pool.request()
+    .input("Id", sql.Int, id)
+    .query(`
+      SELECT 
+        COUNT(*) AS reviewCount,
+        AVG(CAST(OverallScore AS FLOAT)) AS averageRating
+      FROM PlaceReviews
+      WHERE PlaceId = @Id
+    `);
+
+  const stats = reviewResult.recordset[0];
+
+  return {
+    ...place,
+    reviewCount: stats.reviewCount,
+    averageRating: stats.averageRating || 0
+  };
+}
+
 module.exports = {
   getAllPlaces,
   createPlace,
+  getPlaceById,
 };
