@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity
+} from "react-native";
 import axios from "axios";
 
-export default function MekanDetailScreen({ route }) {
+export default function MekanDetailScreen({ route, navigation }) {
   const [mekan, setMekan] = useState(null);
 
 
@@ -60,6 +65,18 @@ export default function MekanDetailScreen({ route }) {
             {mekan.reviewCount ?? 0}
           </Text>
         </View>
+        <TouchableOpacity
+  style={styles.rateButton}
+  onPress={() =>
+    navigation.navigate("RatingScreen", {
+      id: mekan.id
+    })
+  }
+>
+  <Text style={styles.rateButtonText}>
+    Puan Ver
+  </Text>
+</TouchableOpacity>
       </View>
     </View>
   );
@@ -119,4 +136,18 @@ const styles = StyleSheet.create({
     color: "#222",
     fontWeight: "600",
   },
+
+  rateButton: {
+  backgroundColor: "#4CAF50",
+  padding: 14,
+  borderRadius: 12,
+  marginTop: 20,
+  alignItems: "center",
+},
+
+rateButtonText: {
+  color: "white",
+  fontSize: 16,
+  fontWeight: "bold",
+},
 });

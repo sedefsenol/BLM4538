@@ -9,6 +9,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import MekanDetailScreen from "../screens/MekanDetailScreen";
+import RatingScreen from "../screens/RatingScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -67,6 +68,11 @@ function HomeStack() {
         component={MekanDetailScreen}
         options={{ title: "Mekan Detayı" }}
       />
+      <Stack.Screen
+  name="RatingScreen"
+  component={RatingScreen}
+  options={{ title: "Mekan Puanlama" }}
+/>
     </Stack.Navigator>
   );
 }
