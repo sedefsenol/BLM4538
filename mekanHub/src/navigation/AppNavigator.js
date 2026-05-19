@@ -68,7 +68,7 @@ function HomeStack() {
         component={MekanDetailScreen}
         options={{ title: "Mekan Detayı" }}
       />
-      <Stack.Screen
+      <Stack.Screen                       
   name="RatingScreen"
   component={RatingScreen}
   options={{ title: "Mekan Puanlama" }}

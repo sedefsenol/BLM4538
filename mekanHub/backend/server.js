@@ -11,6 +11,10 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/places", placeRoutes);
 
+const reviewRoutes = require("./routes/reviewRoutes");
+
+app.use("/api/reviews", reviewRoutes);
+
 app.get("/", (req, res) => {
   res.send("MekanHub backend çalışıyor");
 });

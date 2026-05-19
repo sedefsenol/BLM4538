@@ -5,7 +5,7 @@ async function getAllPlaces() {
 
   const result = await pool.request().query(`
     SELECT 
-      Id, CreatedByUserId, Name, Location, Description, CreatedAt
+      Id, CreatedByUserId, Name, Location, Description, AverageRating, CreatedAt, ImageUrl
     FROM Places
     ORDER BY Id DESC
   `);
@@ -22,10 +22,36 @@ async function createPlace(place) {
     .input("Name", sql.NVarChar, place.name)
     .input("Location", sql.NVarChar, place.location)
     .input("Description", sql.NVarChar, place.description)
+    .input("AverageRating", sql.Float, place.averageRating || 0)
+    .input("ImageUrl", sql.NVarChar, place.imageUrl || null)
     .query(`
-      INSERT INTO Places (CreatedByUserId, Name, Location, Description)
-      OUTPUT INSERTED.Id, INSERTED.CreatedByUserId, INSERTED.Name, INSERTED.Location, INSERTED.Description, INSERTED.AverageRating, INSERTED.CreatedAt
-      VALUES (@CreatedByUserId, @Name, @Location, @Description)
+      INSERT INTO Places 
+      (
+        CreatedByUserId, 
+        Name, 
+        Location, 
+        Description,
+        AverageRating,
+        ImageUrl
+      )
+      OUTPUT 
+        INSERTED.Id, 
+        INSERTED.CreatedByUserId, 
+        INSERTED.Name, 
+        INSERTED.Location, 
+        INSERTED.Description, 
+        INSERTED.AverageRating, 
+        INSERTED.CreatedAt,
+        INSERTED.ImageUrl
+      VALUES 
+      (
+        @CreatedByUserId, 
+        @Name, 
+        @Location, 
+        @Description,
+        @AverageRating,
+        @ImageUrl
+      )
     `);
 
   return result.recordset[0];
@@ -34,11 +60,12 @@ async function createPlace(place) {
 async function getPlaceById(id) {
   await poolConnect;
 
-  const placeResult = await pool.request()
+  const placeResult = await pool
+    .request()
     .input("Id", sql.Int, id)
     .query(`
       SELECT 
-        Id, CreatedByUserId, Name, Location, Description, CreatedAt
+        Id, CreatedByUserId, Name, Location, Description, AverageRating, CreatedAt, ImageUrl
       FROM Places
       WHERE Id = @Id
     `);
@@ -47,7 +74,26 @@ async function getPlaceById(id) {
 
   if (!place) return null;
 
-  const reviewResult = await pool.request()
+  const reviewResult = await pool
+    .request()
+    .input("Id", sql.Int, id)
+    .query(`
+      SELECT 
+        r.Id AS id,
+        r.PlaceId AS placeId,
+        r.UserId AS userId,
+        r.OverallScore AS rating,
+        r.Comment AS comment,
+        r.CreatedAt AS createdAt,
+        u.FullName AS fullName
+      FROM PlaceReviews r
+      LEFT JOIN Users u ON r.UserId = u.Id
+      WHERE r.PlaceId = @Id
+      ORDER BY r.CreatedAt DESC
+    `);
+
+  const statsResult = await pool
+    .request()
     .input("Id", sql.Int, id)
     .query(`
       SELECT 
@@ -57,12 +103,13 @@ async function getPlaceById(id) {
       WHERE PlaceId = @Id
     `);
 
-  const stats = reviewResult.recordset[0];
+  const stats = statsResult.recordset[0];
 
   return {
     ...place,
     reviewCount: stats.reviewCount,
-    averageRating: stats.averageRating || 0
+    averageRating: stats.averageRating || 0,
+    reviews: reviewResult.recordset,
   };
 }
 
