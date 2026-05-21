@@ -9,9 +9,11 @@ import {
 } from "react-native";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "../context/ThemeContext";
 
 export default function MekanDetailScreen({ route, navigation }) {
   const { id } = route.params;
+  const { isDark } = useTheme();
 
   const [mekan, setMekan] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -43,41 +45,72 @@ export default function MekanDetailScreen({ route, navigation }) {
     return new Date(date).toLocaleDateString("tr-TR");
   };
 
+  const puanGoster = (puan) => {
+    const sayi = Number(puan);
+    return sayi > 0 ? sayi.toFixed(1) : "Henüz puan yok";
+  };
+
   if (!mekan) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Yükleniyor...</Text>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: isDark ? "#111" : "#f6f6f6" },
+        ]}
+      >
+        <Text style={{ color: isDark ? "#fff" : "#222" }}>Yükleniyor...</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? "#111" : "#f6f6f6" },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       {mekan.imageUrl ? (
         <Image source={{ uri: mekan.imageUrl }} style={styles.placeImage} />
       ) : (
-        <View style={styles.imagePlaceholder}>
+        <View
+          style={[
+            styles.imagePlaceholder,
+            { backgroundColor: isDark ? "#2a2a2a" : "#d9e4d8" },
+          ]}
+        >
           <Text style={styles.imageText}>Mekan Görseli</Text>
         </View>
       )}
 
-      <View style={styles.infoCard}>
-        <Text style={styles.title}>{mekan.name}</Text>
-
+      <View
+        style={[
+          styles.infoCard,
+          { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
+        ]}
+      >
+        <Text style={[styles.title, { color: isDark ? "#fff" : "#222" }]}>
+          {mekan.name}
+        </Text>
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>Konum</Text>
-          <Text style={styles.value}>{mekan.location || "Belirtilmedi"}</Text>
+          <Text style={[styles.label, { color: isDark ? "#bbb" : "#777" }]}>
+            Konum
+          </Text>
+          <Text style={[styles.value, { color: isDark ? "#fff" : "#222" }]}>
+            {mekan.location || "Belirtilmedi"}
+          </Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>Puan</Text>
-          <Text style={styles.value}>
-  {mekan.averageRating > 0 ? mekan.averageRating : "Henüz puan yok"}
-</Text>
+          <Text style={[styles.label, { color: isDark ? "#bbb" : "#777" }]}>
+            Puan
+          </Text>
+          <Text style={[styles.value, { color: isDark ? "#fff" : "#222" }]}>
+            {puanGoster(mekan.averageRating)}
+          </Text>
         </View>
-
-       
 
         <TouchableOpacity
           style={styles.rateButton}
@@ -87,27 +120,65 @@ export default function MekanDetailScreen({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.sectionTitle}>Yorumlar</Text>
+      <Text style={[styles.sectionTitle, { color: isDark ? "#fff" : "#222" }]}>
+        Yorumlar
+      </Text>
 
       {reviews.length === 0 ? (
-        <View style={styles.emptyCommentBox}>
-          <Text style={styles.emptyText}>Henüz yorum yapılmamış.</Text>
+        <View
+          style={[
+            styles.emptyCommentBox,
+            { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
+          ]}
+        >
+          <Text style={[styles.emptyText, { color: isDark ? "#aaa" : "#777" }]}>
+            Henüz yorum yapılmamış.
+          </Text>
         </View>
       ) : (
         reviews.map((review, index) => (
-          <View key={review.id || index} style={styles.commentCard}>
+          <View
+            key={review.id || index}
+            style={[
+              styles.commentCard,
+              { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
+            ]}
+          >
             <View style={styles.commentHeader}>
-              <Text style={styles.commentUser}>
+              <Text
+                style={[
+                  styles.commentUser,
+                  { color: isDark ? "#fff" : "#222" },
+                ]}
+              >
                 {review.fullName || review.userName || "Kullanıcı"}
               </Text>
-              <Text style={styles.commentDate}>
+
+              <Text
+                style={[
+                  styles.commentDate,
+                  { color: isDark ? "#999" : "#777" },
+                ]}
+              >
                 {formatDate(review.createdAt)}
               </Text>
             </View>
 
-            <Text style={styles.commentRating}>⭐ {review.rating ?? 0}</Text>
+            <Text
+              style={[
+                styles.commentRating,
+                { color: isDark ? "#ccc" : "#444" },
+              ]}
+            >
+              ⭐ {Number(review.rating || 0).toFixed(1)}
+            </Text>
 
-            <Text style={styles.commentText}>
+            <Text
+              style={[
+                styles.commentText,
+                { color: isDark ? "#ccc" : "#444" },
+              ]}
+            >
               {review.comment || "Yorum bulunmuyor."}
             </Text>
           </View>
@@ -120,7 +191,6 @@ export default function MekanDetailScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f6f6f6",
     padding: 16,
   },
 
@@ -139,7 +209,6 @@ const styles = StyleSheet.create({
 
   imagePlaceholder: {
     height: 180,
-    backgroundColor: "#d9e4d8",
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
@@ -147,13 +216,12 @@ const styles = StyleSheet.create({
   },
 
   imageText: {
-    color: "#4d5c4c",
+    color: "#698a6b",
     fontWeight: "600",
     fontSize: 16,
   },
 
   infoCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 18,
     padding: 13,
     elevation: 3,
@@ -163,15 +231,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#222",
     marginBottom: 8,
-  },
-
-  description: {
-    fontSize: 15,
-    color: "#666",
-    lineHeight: 22,
-    marginBottom: 16,
   },
 
   infoRow: {
@@ -180,13 +240,11 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 13,
-    color: "#777",
     marginBottom: 3,
   },
 
   value: {
     fontSize: 16,
-    color: "#222",
     fontWeight: "600",
   },
 
@@ -207,12 +265,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 21,
     fontWeight: "bold",
-    color: "#222",
     marginBottom: 12,
   },
 
   commentCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 14,
     marginBottom: 12,
@@ -228,35 +284,29 @@ const styles = StyleSheet.create({
   commentUser: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "#222",
   },
 
   commentDate: {
     fontSize: 12,
-    color: "#777",
   },
 
   commentRating: {
     fontSize: 14,
-    color: "#444",
     marginBottom: 6,
   },
 
   commentText: {
     fontSize: 14,
-    color: "#444",
     lineHeight: 20,
   },
 
   emptyCommentBox: {
-    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 16,
     marginBottom: 30,
   },
 
   emptyText: {
-    color: "#777",
     textAlign: "center",
   },
 });

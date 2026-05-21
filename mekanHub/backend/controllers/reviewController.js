@@ -140,9 +140,41 @@ async function getPopularPlacesController(req, res) {
     res.status(500).json({ message: "Popular places could not be fetched" });
   }
 }
+async function getUserReviews(req, res) {
+  try {
+    await poolConnect;
+
+    const userId = req.params.userId;
+
+    const result = await pool
+      .request()
+      .input("UserId", sql.Int, userId)
+      .query(`
+        SELECT 
+          r.Id AS id,
+          r.PlaceId AS placeId,
+          r.UserId AS userId,
+          r.OverallScore AS rating,
+          r.Comment AS comment,
+          r.CreatedAt AS createdAt,
+          p.Name AS placeName,
+          p.Location AS placeLocation
+        FROM PlaceReviews r
+        INNER JOIN Places p ON r.PlaceId = p.Id
+        WHERE r.UserId = @UserId
+        ORDER BY r.CreatedAt DESC
+      `);
+
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("GET USER REVIEWS ERROR:", error);
+    res.status(500).json({ message: "User reviews could not be fetched" });
+  }
+}
 
 module.exports = {
   addReview,
   getLatestReviews,
   getPopularPlaces: getPopularPlacesController,
+  getUserReviews,
 };

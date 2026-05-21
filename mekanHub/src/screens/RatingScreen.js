@@ -9,9 +9,13 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
+import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function RatingScreen({ route, navigation }) {
   const { id } = route.params;
+  const { isDark } = useTheme();
+    const { user } = useAuth();
 
   const API_URL = "http://10.0.2.2:5000";
 
@@ -25,7 +29,14 @@ export default function RatingScreen({ route, navigation }) {
   const StarRating = ({ title, value, onChange }) => {
     return (
       <View style={styles.ratingBox}>
-        <Text style={styles.subTitle}>{title}</Text>
+        <Text
+          style={[
+            styles.subTitle,
+            { color: isDark ? "#fff" : "#222" },
+          ]}
+        >
+          {title}
+        </Text>
 
         <View style={styles.starRow}>
           {[1, 2, 3, 4, 5].map((item) => (
@@ -55,7 +66,7 @@ export default function RatingScreen({ route, navigation }) {
 
     const payload = {
       placeId: id,
-      userId: 1,
+      userId: user.id,
       quietnessScore: quietness,
       wifiScore: wifi,
       socketScore: socket,
@@ -67,25 +78,12 @@ export default function RatingScreen({ route, navigation }) {
     };
 
     try {
-      console.log("API_URL:", API_URL);
-      console.log("REVIEW PAYLOAD:", payload);
-
-      const response = await axios.post(`${API_URL}/api/reviews`, payload);
-
-      console.log("REVIEW SUCCESS:", response.data);
+      await axios.post(`${API_URL}/api/reviews`, payload);
 
       Alert.alert("Başarılı", "Değerlendirme kaydedildi");
-
       navigation.navigate("MekanDetail", { id });
     } catch (error) {
-      console.log("===== REVIEW ERROR START =====");
-      console.log("ERROR MESSAGE:", error.message);
-      console.log("ERROR STATUS:", error.response?.status);
-      console.log("ERROR DATA:", error.response?.data);
-      console.log("ERROR URL:", error.config?.url);
-      console.log("ERROR METHOD:", error.config?.method);
-      console.log("ERROR PAYLOAD:", error.config?.data);
-      console.log("===== REVIEW ERROR END =====");
+      console.log("REVIEW ERROR:", error.response?.data || error.message);
 
       Alert.alert(
         "Kayıt başarısız",
@@ -95,7 +93,13 @@ export default function RatingScreen({ route, navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? "#111" : "#fff" },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       <StarRating title="Sessizlik" value={quietness} onChange={setQuietness} />
       <StarRating title="Wi-Fi" value={wifi} onChange={setWifi} />
       <StarRating title="Priz" value={socket} onChange={setSocket} />
@@ -106,16 +110,30 @@ export default function RatingScreen({ route, navigation }) {
         onChange={setCrowdedness}
       />
 
-      <Text style={styles.subTitle}>Yorum</Text>
+      <Text
+        style={[
+          styles.subTitle,
+          { color: isDark ? "#fff" : "#222" },
+        ]}
+      >
+        Yorum
+      </Text>
 
       <TextInput
         placeholder="Yorum yaz..."
-        style={styles.commentInput}
+        style={[
+          styles.commentInput,
+          {
+            backgroundColor: isDark ? "#1e1e1e" : "#fff",
+            color: isDark ? "#fff" : "#222",
+            borderColor: isDark ? "#333" : "#ccc",
+          },
+        ]}
         multiline
         numberOfLines={5}
         value={comment}
         onChangeText={setComment}
-        placeholderTextColor="#777"
+        placeholderTextColor={isDark ? "#888" : "#777"}
       />
 
       <TouchableOpacity style={styles.button} onPress={submitReview}>
@@ -128,7 +146,6 @@ export default function RatingScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     padding: 20,
   },
 
@@ -140,7 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
-    color: "#222",
   },
 
   starRow: {
@@ -156,13 +172,11 @@ const styles = StyleSheet.create({
 
   commentInput: {
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 12,
     padding: 12,
     height: 120,
     textAlignVertical: "top",
     marginBottom: 18,
-    color: "#222",
     fontSize: 15,
   },
 

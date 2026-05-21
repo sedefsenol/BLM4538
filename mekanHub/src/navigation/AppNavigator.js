@@ -10,6 +10,7 @@ import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import MekanDetailScreen from "../screens/MekanDetailScreen";
 import RatingScreen from "../screens/RatingScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -85,10 +86,17 @@ function SearchStack() {
         component={MekanListScreen}
         options={{ title: "MekanHub" }}
       />
+
       <Stack.Screen
         name="MekanDetailSearch"
         component={MekanDetailScreen}
         options={{ title: "Mekan Detayı" }}
+      />
+
+      <Stack.Screen
+        name="RatingScreen"
+        component={RatingScreen}
+        options={{ title: "Mekan Puanlama" }}
       />
     </Stack.Navigator>
   );
@@ -101,6 +109,12 @@ function ProfileStack() {
         name="ProfileMain"
         component={ProfileScreen}
         options={{ title: "MekanHub" }}
+      />
+
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: "Ayarlar" }}
       />
     </Stack.Navigator>
   );

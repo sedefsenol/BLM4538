@@ -7,22 +7,33 @@ import {
   ImageBackground,
 } from "react-native";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
-export default function LoginScreen({ navigation }) {  const [fullName, setFullName] = useState("");
+export default function LoginScreen({ navigation }) {
+  const { login } = useAuth();
+
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const API_URL = "http://10.0.2.2:5000";
 
   const handleLogin = async () => {
     setErrorMessage("");
 
     try {
-      await axios.post(
-        "http://172.26.239.58:5000/api/auth/login",
+      const response = await axios.post(
+        `${API_URL}/api/auth/login`,
         {
           fullName: fullName.trim(),
           password: password.trim(),
         }
       );
+
+      console.log("LOGIN RESPONSE:", response.data);
+
+      // Giriş yapan kullanıcıyı kaydet
+      login(response.data.user);
 
       navigation.replace("MainTabs");
     } catch (error) {
@@ -80,6 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 24,
   },
+
   title: {
     fontSize: 34,
     fontWeight: "bold",
@@ -87,6 +99,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
   },
+
   subtitle: {
     fontSize: 22,
     fontWeight: "600",
@@ -94,6 +107,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 28,
   },
+
   input: {
     backgroundColor: "#f8f8f8",
     borderWidth: 1,
@@ -105,6 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     color: "#222",
   },
+
   button: {
     backgroundColor: "#698a6b",
     paddingVertical: 15,
@@ -113,11 +128,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 8,
   },
+
   buttonText: {
     color: "#222",
     fontSize: 17,
     fontWeight: "bold",
   },
+
   errorText: {
     color: "red",
     fontSize: 14,
@@ -125,6 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: "500",
   },
+
   linkText: {
     textAlign: "center",
     fontSize: 16,

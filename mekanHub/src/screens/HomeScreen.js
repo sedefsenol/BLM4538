@@ -9,11 +9,13 @@ import {
 } from "react-native";
 import axios from "axios";
 import MapView, { Marker } from "react-native-maps";
+import { useTheme } from "../context/ThemeContext";
 
 export default function HomeScreen({ navigation }) {
+  const { isDark } = useTheme();
+
   const [mekanlar, setMekanlar] = useState([]);
   const [latestReviews, setLatestReviews] = useState([]);
-  const [popularPlaces, setPopularPlaces] = useState([]);
 
   const API_URL = "http://10.0.2.2:5000";
 
@@ -57,14 +59,6 @@ export default function HomeScreen({ navigation }) {
       .get(`${API_URL}/api/reviews/latest`)
       .then((res) => setLatestReviews(res.data.slice(0, 5)))
       .catch((err) => console.log("LATEST REVIEWS ERROR:", err));
-
-    axios
-      .get(`${API_URL}/api/reviews/popular-places`)
-      .then((res) => {
-        const sadeceCafeler = res.data.filter(cafeMi);
-        setPopularPlaces(sadeceCafeler.slice(0, 5));
-      })
-      .catch((err) => console.log("POPULAR PLACES ERROR:", err));
   }, []);
 
   const openCafeDetail = async (mekan) => {
@@ -91,8 +85,16 @@ export default function HomeScreen({ navigation }) {
   const oneCikanMekanlar = mekanlar.slice(0, 5);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.pageTitle}>Ana Sayfa</Text>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? "#111" : "#f6f6f6" },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={[styles.pageTitle, { color: isDark ? "#fff" : "#222" }]}>
+        Ana Sayfa
+      </Text>
 
       <View style={styles.mapContainer}>
         <MapView
@@ -119,52 +121,84 @@ export default function HomeScreen({ navigation }) {
         </MapView>
       </View>
 
-      <Text style={styles.sectionTitle}>Öne Çıkan Mekanlar</Text>
+      <Text style={[styles.sectionTitle, { color: isDark ? "#fff" : "#222" }]}>
+        Öne Çıkan Mekanlar
+      </Text>
 
       {oneCikanMekanlar.map((item) => (
         <TouchableOpacity
           key={item.id}
-          style={styles.mekanCard}
+          style={[
+            styles.mekanCard,
+            { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
+          ]}
           onPress={() => openCafeDetail(item)}
         >
           {item.imageUrl ? (
             <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
           ) : (
-            <View style={styles.imagePlaceholder}>
+            <View
+              style={[
+                styles.imagePlaceholder,
+                { backgroundColor: isDark ? "#2a2a2a" : "#e4efe3" },
+              ]}
+            >
               <Text style={styles.imageText}>Mekan Görseli</Text>
             </View>
           )}
 
-          <Text style={styles.mekanTitle}>{item.name}</Text>
+          <Text style={[styles.mekanTitle, { color: isDark ? "#fff" : "#222" }]}>
+            {item.name}
+          </Text>
 
-          <Text style={styles.mekanDesc}>
+          <Text style={[styles.mekanDesc, { color: isDark ? "#ccc" : "#666" }]}>
             {item.location || "Adres bilgisi yok"}
           </Text>
 
           <View style={styles.cardBottomRow}>
-            <Text style={styles.mekanInfo}>
+            <Text style={[styles.mekanInfo, { color: isDark ? "#ccc" : "#444" }]}>
               ⭐ {puanGoster(item.averageRating)}
             </Text>
 
-            <Text style={styles.mekanInfo}>
+            <Text style={[styles.mekanInfo, { color: isDark ? "#ccc" : "#444" }]}>
               💬 {item.reviewCount ?? 0} yorum
             </Text>
           </View>
         </TouchableOpacity>
       ))}
 
-      <Text style={styles.sectionTitle}>Son Yorumlar</Text>
+      <Text style={[styles.sectionTitle, { color: isDark ? "#fff" : "#222" }]}>
+        Son Yorumlar
+      </Text>
 
       {latestReviews.length === 0 ? (
-        <View style={styles.commentCard}>
-          <Text style={styles.commentText}>Henüz yorum bulunmuyor.</Text>
+        <View
+          style={[
+            styles.commentCard,
+            { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
+          ]}
+        >
+          <Text style={[styles.commentText, { color: isDark ? "#ccc" : "#444" }]}>
+            Henüz yorum bulunmuyor.
+          </Text>
         </View>
       ) : (
         latestReviews.map((review) => (
-          <View key={review.id} style={styles.commentCard}>
+          <View
+            key={review.id}
+            style={[
+              styles.commentCard,
+              { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
+            ]}
+          >
             <View style={styles.commentTopRow}>
               <View style={{ flex: 1, paddingRight: 8 }}>
-                <Text style={styles.commentUser}>
+                <Text
+                  style={[
+                    styles.commentUser,
+                    { color: isDark ? "#fff" : "#222" },
+                  ]}
+                >
                   {review.fullName || review.userName || "Kullanıcı"}
                 </Text>
 
@@ -178,11 +212,11 @@ export default function HomeScreen({ navigation }) {
               </Text>
             </View>
 
-            <Text style={styles.commentText}>
+            <Text style={[styles.commentText, { color: isDark ? "#ccc" : "#444" }]}>
               {review.comment || "Yorum bulunmuyor."}
             </Text>
 
-            <Text style={styles.commentDate}>
+            <Text style={[styles.commentDate, { color: isDark ? "#999" : "#888" }]}>
               {review.createdAt
                 ? new Date(review.createdAt).toLocaleDateString("tr-TR")
                 : ""}
@@ -197,7 +231,6 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f6f6f6",
     paddingHorizontal: 14,
     paddingTop: 14,
   },
@@ -205,7 +238,6 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#222",
     marginBottom: 14,
   },
 
@@ -224,12 +256,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#222",
     marginBottom: 12,
   },
 
   mekanCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 14,
     marginBottom: 14,
@@ -239,7 +269,6 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     height: 120,
     borderRadius: 12,
-    backgroundColor: "#e4efe3",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
@@ -253,20 +282,18 @@ const styles = StyleSheet.create({
   },
 
   imageText: {
-    color: "#4d5c4c",
+    color: "#698a6b",
     fontWeight: "600",
   },
 
   mekanTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#222",
     marginBottom: 6,
   },
 
   mekanDesc: {
     fontSize: 14,
-    color: "#666",
     marginBottom: 8,
   },
 
@@ -278,13 +305,11 @@ const styles = StyleSheet.create({
 
   mekanInfo: {
     fontSize: 13,
-    color: "#444",
     marginBottom: 2,
     fontWeight: "500",
   },
 
   commentCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 14,
     marginBottom: 12,
@@ -301,7 +326,6 @@ const styles = StyleSheet.create({
   commentUser: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#222",
   },
 
   commentPlace: {
@@ -323,14 +347,12 @@ const styles = StyleSheet.create({
 
   commentText: {
     fontSize: 14,
-    color: "#444",
     lineHeight: 20,
     marginBottom: 6,
   },
 
   commentDate: {
     fontSize: 12,
-    color: "#888",
     marginTop: 8,
     textAlign: "right",
   },
