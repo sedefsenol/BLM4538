@@ -16,4 +16,6 @@ hafta 7 https://drive.google.com/file/d/1XCNIkgyxVob6cbpn85Zymue0lnztRhAh/view?u
 
 hafta 8 https://drive.google.com/file/d/13qn20DdGbtNKYMP4GOtJ97Trf4mQvdWR/view?usp=sharing
 
+hafta 9 https://drive.google.com/file/d/1ZRfxqjEgB7i3Hako1jEMipbEtpmg5Qgj/view?usp=drive_link
+
 tüm haftalar https://drive.google.com/drive/folders/1EGHrsGEHn90JTxdqRkbXb7-nZCBaZeYK?usp=sharing
