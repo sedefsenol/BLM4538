@@ -1,4 +1,7 @@
-# BLM4538
+# MEKANHUB
+
+
+MekanHub, kullanıcıların çevrelerindeki kafe ve çalışma alanlarını kolayca keşfedebildiği bir mobil platformdur. Uygulama sayesinde kullanıcılar mekanlar hakkında bilgi alabilir, puanlama ve yorum yapabilir, diğer kullanıcıların deneyimlerini inceleyebilir ve kendileri için en uygun çalışma ortamını bulabilir. Proje, React Native, Node.js, Express ve SQL Server teknolojileri kullanılarak geliştirilmiştir.
 
 hafta 1 https://drive.google.com/file/d/17MEE_z1TmxYhRhBq5GvJemXsHPZUOC2A/view?usp=sharing
 
