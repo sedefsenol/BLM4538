@@ -171,10 +171,53 @@ async function getUserReviews(req, res) {
     res.status(500).json({ message: "User reviews could not be fetched" });
   }
 }
+async function voteReview(req, res) {
+  try {
+    await poolConnect;
+
+    const { reviewId, userId, voteType } = req.body;
+
+    if (!reviewId || !userId || !voteType) {
+      return res.status(400).json({ message: "Eksik bilgi var" });
+    }
+
+    if (voteType !== "like" && voteType !== "dislike") {
+      return res.status(400).json({ message: "Geçersiz oy tipi" });
+    }
+
+    await pool
+      .request()
+      .input("ReviewId", sql.Int, reviewId)
+      .input("UserId", sql.Int, userId)
+      .input("VoteType", sql.NVarChar, voteType)
+      .query(`
+        IF EXISTS (
+          SELECT 1 FROM ReviewVotes
+          WHERE ReviewId = @ReviewId AND UserId = @UserId
+        )
+        BEGIN
+          UPDATE ReviewVotes
+          SET VoteType = @VoteType
+          WHERE ReviewId = @ReviewId AND UserId = @UserId
+        END
+        ELSE
+        BEGIN
+          INSERT INTO ReviewVotes (ReviewId, UserId, VoteType)
+          VALUES (@ReviewId, @UserId, @VoteType)
+        END
+      `);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("VOTE REVIEW ERROR:", error);
+    res.status(500).json({ message: "Vote error" });
+  }
+}
 
 module.exports = {
   addReview,
   getLatestReviews,
   getPopularPlaces: getPopularPlacesController,
   getUserReviews,
+  voteReview,
 };

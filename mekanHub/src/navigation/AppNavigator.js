@@ -116,6 +116,18 @@ function ProfileStack() {
         component={SettingsScreen}
         options={{ title: "Ayarlar" }}
       />
+
+      <Stack.Screen
+        name="MekanDetail"
+        component={MekanDetailScreen}
+        options={{ title: "Mekan Detayı" }}
+      />
+
+      <Stack.Screen
+        name="RatingScreen"
+        component={RatingScreen}
+        options={{ title: "Mekan Puanlama" }}
+      />
     </Stack.Navigator>
   );
 }

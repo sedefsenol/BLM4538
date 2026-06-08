@@ -49,6 +49,20 @@ export default function MekanDetailScreen({ route, navigation }) {
     const sayi = Number(puan);
     return sayi > 0 ? sayi.toFixed(1) : "Henüz puan yok";
   };
+  const voteReview = async (reviewId, voteType) => {
+  try {
+    const res = await axios.post("http://10.0.2.2:5000/api/reviews/vote", {
+      reviewId,
+      userId: 1,
+      voteType,
+    });
+
+    console.log("VOTE SUCCESS:", res.data);
+    getMekanDetail();
+  } catch (error) {
+    console.log("VOTE ERROR:", error.response?.data || error.message);
+  }
+};
 
   if (!mekan) {
     return (
@@ -172,15 +186,37 @@ export default function MekanDetailScreen({ route, navigation }) {
             >
               ⭐ {Number(review.rating || 0).toFixed(1)}
             </Text>
+            <View style={styles.commentBottomRow}>
+  <Text
+    style={[
+      styles.commentText,
+      { color: isDark ? "#ccc" : "#444" },
+    ]}
+  >
+    {review.comment || "Yorum bulunmuyor."}
+  </Text>
 
-            <Text
-              style={[
-                styles.commentText,
-                { color: isDark ? "#ccc" : "#444" },
-              ]}
-            >
-              {review.comment || "Yorum bulunmuyor."}
-            </Text>
+  <View style={styles.voteContainer}>
+  <TouchableOpacity
+    style={styles.voteButton}
+    onPress={() => voteReview(review.id, "like")}
+  >
+    <Text style={styles.likeIcon}>♡</Text>
+    <Text style={styles.voteCount}>{review.likeCount ?? 0}</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.voteButton}
+    onPress={() => voteReview(review.id, "dislike")}
+  >
+    <Text style={styles.dislikeIcon}>×</Text>
+    <Text style={styles.voteCount}>{review.dislikeCount ?? 0}</Text>
+  </TouchableOpacity>
+</View>
+</View>
+
+            
+            
           </View>
         ))
       )}
@@ -309,4 +345,58 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: "center",
   },
+  
+
+
+
+commentBottomRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "flex-end",
+  gap: 8,
+},
+
+commentText: {
+  flex: 1,
+  fontSize: 14,
+  lineHeight: 20,
+},
+
+voteContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  flexShrink: 0,
+},
+
+voteButton: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#f3f5f2",
+  paddingHorizontal: 8,
+  paddingVertical: 5,
+  borderRadius: 14,
+  marginLeft: 5,
+},
+
+likeIcon: {
+  fontSize: 16,
+  color: "#698a6b",
+  fontWeight: "bold",
+},
+
+dislikeIcon: {
+  fontSize: 16,
+  color: "#777",
+  fontWeight: "bold",
+},
+
+voteCount: {
+  fontSize: 12,
+  fontWeight: "bold",
+  color: "#333",
+  marginLeft: 3,
+},
+
+
+
 });

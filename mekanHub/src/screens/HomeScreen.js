@@ -82,6 +82,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+
+  const openReviewDetail = (review) => {
+  console.log("TIKLANAN YORUM:", review);
+
+  const placeId = review.placeId || review.PlaceId || review.PlaceID;
+
+  if (!placeId) {
+    alert("Bu yorumda mekan id yok. Backend'den placeId gelmiyor.");
+    return;
+  }
+
+  navigation.navigate("MekanDetail", {
+    id: placeId,
+  });
+};
   const oneCikanMekanlar = mekanlar.slice(0, 5);
 
   return (
@@ -184,12 +199,13 @@ export default function HomeScreen({ navigation }) {
         </View>
       ) : (
         latestReviews.map((review) => (
-          <View
-            key={review.id}
+  <TouchableOpacity
+    key={review.id}
             style={[
               styles.commentCard,
               { backgroundColor: isDark ? "#1e1e1e" : "#fff" },
             ]}
+             onPress={() => openReviewDetail(review)}
           >
             <View style={styles.commentTopRow}>
               <View style={{ flex: 1, paddingRight: 8 }}>
@@ -221,7 +237,7 @@ export default function HomeScreen({ navigation }) {
                 ? new Date(review.createdAt).toLocaleDateString("tr-TR")
                 : ""}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))
       )}
     </ScrollView>

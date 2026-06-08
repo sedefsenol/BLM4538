@@ -17,7 +17,7 @@ export default function RegisterScreen({ navigation }) {
   const handleRegister = async () => {
   try {
     await axios.post(
-      "http://172.26.239.58:5000/api/auth/register",
+  "http://10.0.2.2:5000/api/auth/register",
       {
         fullName: name.trim(),
         email: email.trim().toLowerCase(),

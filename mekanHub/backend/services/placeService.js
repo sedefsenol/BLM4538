@@ -79,17 +79,27 @@ async function getPlaceById(id) {
     .input("Id", sql.Int, id)
     .query(`
       SELECT 
-        r.Id AS id,
-        r.PlaceId AS placeId,
-        r.UserId AS userId,
-        r.OverallScore AS rating,
-        r.Comment AS comment,
-        r.CreatedAt AS createdAt,
-        u.FullName AS fullName
-      FROM PlaceReviews r
-      LEFT JOIN Users u ON r.UserId = u.Id
-      WHERE r.PlaceId = @Id
-      ORDER BY r.CreatedAt DESC
+  r.Id AS id,
+  r.PlaceId AS placeId,
+  r.UserId AS userId,
+  r.OverallScore AS rating,
+  r.Comment AS comment,
+  r.CreatedAt AS createdAt,
+  u.FullName AS fullName,
+  (
+    SELECT COUNT(*)
+    FROM ReviewVotes rv
+    WHERE rv.ReviewId = r.Id AND rv.VoteType = 'like'
+  ) AS likeCount,
+  (
+    SELECT COUNT(*)
+    FROM ReviewVotes rv
+    WHERE rv.ReviewId = r.Id AND rv.VoteType = 'dislike'
+  ) AS dislikeCount
+FROM PlaceReviews r
+LEFT JOIN Users u ON r.UserId = u.Id
+WHERE r.PlaceId = @Id
+ORDER BY r.CreatedAt DESC
     `);
 
   const statsResult = await pool
